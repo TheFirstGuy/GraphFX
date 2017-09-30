@@ -3,12 +3,17 @@ package org.graphsfx.model;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.StringProperty;
+import javafx.beans.property.StringPropertyBase;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableSet;
+import javafx.collections.SetChangeListener;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import org.graphsfx.graph.Graph;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -71,16 +76,11 @@ public class GraphNode {
 
     // Getters & Setters ===============================================================================================
 
-    public Label getLabel(){
-        return this.label;
-    }
-
-    public String getLabelText(){
-        return this.label.getText();
-    }
-
-    public Pane getPane(){
-        return this.pane;
+    /**
+     * @return unmodifiable set of adjacencies
+     */
+    public Set<GraphNode> getAdjacencies(){
+        return Collections.unmodifiableSet(this.adjacencies);
     }
 
     public double getCenterX(){
@@ -99,15 +99,28 @@ public class GraphNode {
         return this.centerY;
     }
 
-    /**
-     * @return unmodifiable set of adjacencies
-     */
-    public Set<GraphNode> getAdjacencies(){
-        return Collections.unmodifiableSet(this.adjacencies);
+    public Graph getGraph(){
+        return this.graph;
     }
 
-    public void setLabelText( String text ){
-        this.label.setText(text);
+    public String getLabelText(){
+        return this.label.getText();
+    }
+
+    public String getName(){
+        return this.name.getValue();
+    }
+
+    public Pane getPane(){
+        return this.pane;
+    }
+
+    public void setName(String name){
+        this.name.set(name);
+    }
+
+    public void setGraph(Graph graph) {
+        this.graph = graph;
     }
 
     public void setPane(Pane pane){
@@ -116,13 +129,38 @@ public class GraphNode {
 
     // Private Methods =================================================================================================
 
+    private void setLabelText( String text ){
+        this.label.setText(text);
+    }
     /**
      * Initializes all nodes
      */
     private void initialize(){
+        initAdjacencyListener();
         setDragPane();
         setCenterBindings();
     }
+
+    /**
+     * Initializes the adjacency listener
+     */
+    private void initAdjacencyListener(){
+        // Add listener for adjacency
+        this.adjacencies.addListener(new SetChangeListener<GraphNode>() {
+            @Override
+            public void onChanged(Change<? extends GraphNode> change) {
+                if(GraphNode.this.getGraph() != null){
+                    if(change.wasAdded()){
+                        GraphNode.this.getGraph().createGraphEdge(GraphNode.this, change.getElementAdded());
+                    }
+                    else if(change.wasRemoved()){
+                        GraphNode.this.getGraph().removeGraphEdge(GraphNode.this, change.getElementRemoved());
+                    }
+                }
+            }
+        });
+    }
+
 
     /**
      * Adds a OnDrag event handler
@@ -189,14 +227,43 @@ public class GraphNode {
     private Pane pane;
 
     /**
-     * The string to label the node
+     * The label for the node
      */
     private Label label = new Label();
 
     /**
+     * Reference to parent graph
+     */
+    private Graph graph = null;
+
+    /**
+     * The name property for the label
+     */
+
+    private StringProperty name = new StringPropertyBase() {
+        @Override
+        protected void invalidated(){
+            if(getGraph() != null){
+                setLabelText(getName());
+                getGraph().nodeNameChanged();
+            }
+        }
+
+        @Override
+        public Object getBean() {
+            return GraphNode.this;
+        }
+
+        @Override
+        public String getName() {
+            return "name";
+        }
+    };
+
+    /**
      * Adjacent nodes in the graph
      */
-    private HashSet<GraphNode> adjacencies = new HashSet<GraphNode>();
+    private ObservableSet<GraphNode> adjacencies = FXCollections.observableSet();
 
     private DoubleProperty centerX = new SimpleDoubleProperty();
     private DoubleProperty centerY = new SimpleDoubleProperty();

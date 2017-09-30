@@ -20,7 +20,7 @@ public class Main extends Application {
 
         GraphNode test2 = new GraphNode("TestNode2");
 
-        GraphEdge edge = new GraphEdge(GraphEdge.PathType.QUADRATIC);
+        GraphEdge edge = new GraphEdge(GraphEdge.PathType.CUBIC);
         edge.setSourceBindings(test1.getCenterXProperty(), test1.getCenterYProperty());
         edge.setDestBindings(test2.getCenterXProperty(), test2.getCenterYProperty());
 
@@ -35,6 +35,9 @@ public class Main extends Application {
 
         test2.getPane().setLayoutX(75);
         test2.getPane().setLayoutY(50);
+
+        test1.addAdjacency(test2);
+        test1.addAdjacency(test2);
 
     }
 
