@@ -25,9 +25,13 @@ public class Main extends Application {
         edge.setDestBindings(test2.getCenterXProperty(), test2.getCenterYProperty());
 
 
+        Pane nodeLayer = new Pane();
+
         root.getChildren().add(edge);
-        root.getChildren().add(test1.getPane());
-        root.getChildren().add(test2.getPane());
+        root.getChildren().add(nodeLayer);
+
+        nodeLayer.getChildren().add(test1.getPane());
+        nodeLayer.getChildren().add(test2.getPane());
 
         primaryStage.show();
         test1.getPane().setLayoutX(15);
@@ -38,6 +42,8 @@ public class Main extends Application {
 
         test1.addAdjacency(test2);
         test1.addAdjacency(test2);
+
+
 
     }
 

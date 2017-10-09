@@ -151,10 +151,10 @@ public class GraphNode {
             public void onChanged(Change<? extends GraphNode> change) {
                 if(GraphNode.this.getGraph() != null){
                     if(change.wasAdded()){
-                        GraphNode.this.getGraph().createGraphEdge(GraphNode.this, change.getElementAdded());
+                        GraphNode.this.getGraph().createGraphEdgeUnidirectional(GraphNode.this, change.getElementAdded());
                     }
                     else if(change.wasRemoved()){
-                        GraphNode.this.getGraph().removeGraphEdge(GraphNode.this, change.getElementRemoved());
+                        GraphNode.this.getGraph().removeGraphEdgeUnidirectional(GraphNode.this, change.getElementRemoved());
                     }
                 }
             }

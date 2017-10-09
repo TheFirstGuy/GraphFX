@@ -27,14 +27,23 @@ public class TwoKeyMap <K, V> implements Cloneable{
     }
 
     /**
-     * Returns whether the key pair exists in map
+     * Returns whether the key pair exists in map, where the order of the key pair is ignored
      * @param key1 first key to look up object
      * @param key2 second key to look up object
      * @return 'true' if found, 'false' otherwise
      */
-    public boolean containsKeyPair(K key1, K key2){
-        return get(key1, key2) != null;
+    public boolean containsKeyPairBidirectional(K key1, K key2){
+        return getBidirectional(key1, key2) != null;
     }
+
+    /**
+     * Returns whether the key pair exists in map, where key1 is strictly used for the first dimension and key2 for the
+     * second dimension
+     * @param key1 first key to look up object
+     * @param key2 second key to look up object
+     * @return 'true' if found, 'false' otherwise
+     */
+    public boolean containsKeyPairUnidirectional(K key1, K key2){ return getUnidirectional(key1, key2) != null; }
 
     /**
      * Returns whether the map is empty
@@ -51,19 +60,30 @@ public class TwoKeyMap <K, V> implements Cloneable{
      * @param key2 second key to look up object
      * @return value mapped to keys, null otherwise
      */
-    public V get(K key1, K key2){
+    public V getBidirectional(K key1, K key2){
+        V value = getUnidirectional(key1, key2);
+
+        if(value == null){
+            value = getUnidirectional(key2, key1);
+        }
+
+        return value;
+    }
+
+    /**
+     * Returns the value mapped to the pair of key1 and key2, where key1 is used for the first dimension,
+     * and key2 is used for the second dimension
+     * @param key1 first key to look up object
+     * @param key2 second key to look up object
+     * @return value mapped to keys, null otherwise
+     */
+    public V getUnidirectional(K key1, K key2){
         V value = null;
 
         // Check key1 -> key2 pair
         if(myMap.containsKey(key1)){
             if(myMap.get(key1).containsKey(key2)){
                 value = myMap.get(key1).get(key2);
-            }
-        }
-        // Check key2 -> key1 pair
-        else if(myMap.containsKey(key2)){
-            if(myMap.get(key2).containsKey(key1)){
-                value = myMap.get(key2).get(key1);
             }
         }
 
