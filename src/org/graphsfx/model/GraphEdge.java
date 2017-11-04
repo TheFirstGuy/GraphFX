@@ -19,6 +19,13 @@ public class GraphEdge extends Path{
     public static enum PathType{ STRAIGHT, CUBIC, QUADRATIC, ARC };
 
     /**
+     * Default constructor
+     */
+    public GraphEdge(){
+        this(PathType.STRAIGHT);
+    }
+
+    /**
      * Constructor.
      * @param pathType Determines the PathElement that will be initialized.
      */
@@ -48,7 +55,8 @@ public class GraphEdge extends Path{
                 break;
         }
 
-        setDestinationBinds();
+        initializeBinds();
+        //setDestinationBinds();
         //setSourceListeners();
         getElements().add(this.moveTo);
         getElements().add(this.pathElement);
@@ -71,7 +79,7 @@ public class GraphEdge extends Path{
         this.moveTo.yProperty().unbind();
         this.moveTo.xProperty().bind(DoubleBinding.doubleExpression(sourceX));
         this.moveTo.yProperty().bind(DoubleBinding.doubleExpression(sourceY));
-        this.sourceX.bind(sourceX);
+
     }
 
     /**
@@ -84,7 +92,6 @@ public class GraphEdge extends Path{
         this.destY.unbind();
         this.destX.bind(DoubleBinding.doubleExpression(destX));
         this.destY.bind(DoubleBinding.doubleExpression(destY));
-
     }
 
 
@@ -109,12 +116,14 @@ public class GraphEdge extends Path{
     /**
      * Adds change listeners to the destination X and Y properties to modify the pathElement.
      */
-    private void setDestinationBinds(){
+    private void initializeBinds(){
 
         switch(GraphEdge.this.pathType){
 
             case STRAIGHT:
                 // Bind the end point of the line
+                ((LineTo) GraphEdge.this.pathElement).xProperty().setValue(this.destX.getValue());
+                ((LineTo) GraphEdge.this.pathElement).yProperty().setValue(this.destY.getValue());
                 ((LineTo) GraphEdge.this.pathElement).xProperty().bind(this.destX);
                 ((LineTo) GraphEdge.this.pathElement).yProperty().bind(this.destY);
                 break;
@@ -344,7 +353,6 @@ public class GraphEdge extends Path{
 
     private DoubleProperty destX = new SimpleDoubleProperty();
     private DoubleProperty destY = new SimpleDoubleProperty();
-    private DoubleProperty sourceX = new SimpleDoubleProperty();
 
     private PathElement pathElement;
 

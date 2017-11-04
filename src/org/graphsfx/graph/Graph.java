@@ -24,6 +24,17 @@ public abstract class Graph extends Chart{
         initializeListeners();
 
     }
+
+    // Public Methods ==================================================================================================
+
+    /**
+     * Adds a GraphNode to be rendered
+     * @param graphNode GraphNode to be added
+     */
+    public void addGraphNode(GraphNode graphNode){
+        this.graphNodes.add(graphNode);
+    }
+
     public void nodeNameChanged(){
         requestChartLayout();
 
@@ -98,16 +109,21 @@ public abstract class Graph extends Chart{
 
     // Private Methods =================================================================================================
 
+    /**
+     * Initializes listeners for Graph Fields
+     */
     private void initializeListeners(){
         this.graphNodes.addListener(new SetChangeListener<GraphNode>() {
             @Override
             public void onChanged(Change<? extends GraphNode> change) {
                 if(change.wasAdded()){
+                    System.out.println("Added!");
                     GraphNode graphNode = change.getElementAdded();
                     graphNode.setGraph(Graph.this);
 
                     // Handle adjacencies
                     for(GraphNode other : graphNode.getAdjacencies()){
+                        System.out.println("Added: " + other.getName());
 
                         // Add edges
                         Graph.this.createGraphEdgeUnidirectional(graphNode, other);
