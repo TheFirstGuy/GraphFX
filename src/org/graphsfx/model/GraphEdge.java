@@ -56,8 +56,6 @@ public class GraphEdge extends Path{
         }
 
         initializeBinds();
-        //setDestinationBinds();
-        //setSourceListeners();
         getElements().add(this.moveTo);
         getElements().add(this.pathElement);
         setStrokeWidth(3);
@@ -79,7 +77,6 @@ public class GraphEdge extends Path{
         this.moveTo.yProperty().unbind();
         this.moveTo.xProperty().bind(DoubleBinding.doubleExpression(sourceX));
         this.moveTo.yProperty().bind(DoubleBinding.doubleExpression(sourceY));
-
     }
 
     /**
@@ -92,6 +89,8 @@ public class GraphEdge extends Path{
         this.destY.unbind();
         this.destX.bind(DoubleBinding.doubleExpression(destX));
         this.destY.bind(DoubleBinding.doubleExpression(destY));
+        System.out.println("DestX: " + destX.get() + " DestY: " + destY.get());
+        System.out.println("My DestX: " + this.destX.get() + " My DestY: " + this.destY.get());
     }
 
 

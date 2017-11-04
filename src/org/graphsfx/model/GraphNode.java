@@ -170,14 +170,15 @@ public class GraphNode {
         this.pane.setOnMouseDragged(new javafx.event.EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-
+                System.out.println("X: " + event.getX() + " Y:" + event.getY());
                 // Prevent GraphNodes from being dragged offscreen
-                if(event.getSceneX() >= 0) {
-                    GraphNode.this.pane.setLayoutX(event.getSceneX());
+                if(event.getX() >= 0 && (event.getX() + GraphNode.this.pane.getWidth()) <= GraphNode.this.getGraph().getWidth()) {
+                    GraphNode.this.pane.setLayoutX(event.getX());
                 }
-                if(event.getSceneY() >= 0 ){
-                    GraphNode.this.pane.setLayoutY(event.getSceneY());
+                if(event.getY() >= 0 && (event.getY() + GraphNode.this.pane.getHeight()) <= GraphNode.this.getGraph().getHeight()){
+                    GraphNode.this.pane.setLayoutY(event.getY());
                 }
+
             }
         });
 
