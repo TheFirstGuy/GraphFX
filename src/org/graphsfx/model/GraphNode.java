@@ -170,13 +170,16 @@ public class GraphNode {
         this.pane.setOnMouseDragged(new javafx.event.EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                System.out.println("X: " + event.getX() + " Y:" + event.getY());
+                // Calculate coordinates relative to the graph Node.
+                double trueX = event.getSceneX() - GraphNode.this.pane.getScene().getX();
+                double trueY = event.getSceneY() - GraphNode.this.pane.getScene().getY();
+
                 // Prevent GraphNodes from being dragged offscreen
-                if(event.getX() >= 0 && (event.getX() + GraphNode.this.pane.getWidth()) <= GraphNode.this.getGraph().getWidth()) {
-                    GraphNode.this.pane.setLayoutX(event.getX());
+                if(trueX >= 0 && (trueX + GraphNode.this.pane.getWidth()) <= GraphNode.this.getGraph().getWidth()) {
+                    GraphNode.this.pane.setLayoutX(trueX);
                 }
-                if(event.getY() >= 0 && (event.getY() + GraphNode.this.pane.getHeight()) <= GraphNode.this.getGraph().getHeight()){
-                    GraphNode.this.pane.setLayoutY(event.getY());
+                if(trueY >= 0 && (trueY + GraphNode.this.pane.getHeight()) <= GraphNode.this.getGraph().getHeight()){
+                    GraphNode.this.pane.setLayoutY(trueY);
                 }
 
             }

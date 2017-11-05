@@ -14,25 +14,28 @@ public class WebGraph extends Graph {
     @Override
     protected void layoutChartChildren(double top, double left, double width, double height) {
 
-        StackTraceElement[] ste = Thread.currentThread().getStackTrace();
-        for(StackTraceElement element: ste){
-            System.out.println(element);
-        }
         // Snap top and left
         top = snapPosition(top);
         left = snapPosition(left);
         setWidth(width);
         setHeight(height);
-        System.out.println("Top: " + top + " Left: " + left + " Width: " + width + " Height: " + height);
 
     }
 
     // Getters & Setters ===============================================================================================
 
+    /**
+     * Sets the length of the edges between GraphNodes
+     * @param edgeLength length in pixels between GraphNodes
+     */
     public void setEdgeLength(double edgeLength){
         this.edgeLength = edgeLength;
     }
 
+    /**
+     * Returns current edge length
+     * @return the current edge length
+     */
     public double getEdgeLength(){
         return this.edgeLength;
     }
