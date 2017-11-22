@@ -89,9 +89,10 @@ public class GraphEdge extends Path{
         this.destY.unbind();
         this.destX.bind(DoubleBinding.doubleExpression(destX));
         this.destY.bind(DoubleBinding.doubleExpression(destY));
-        System.out.println("DestX: " + destX.get() + " DestY: " + destY.get());
-        System.out.println("My DestX: " + this.destX.get() + " My DestY: " + this.destY.get());
+
     }
+
+
 
 
     public DoubleProperty getDestXProperty(){

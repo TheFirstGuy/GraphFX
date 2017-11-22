@@ -5,6 +5,7 @@ import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import javafx.scene.Group;
 import javafx.scene.chart.Chart;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
 import org.graphsfx.model.GraphEdge;
 import org.graphsfx.model.GraphNode;
@@ -75,10 +76,16 @@ public abstract class Graph extends Chart{
                 edge.setDestBindings(elementAdded.getCenterXProperty(), elementAdded.getCenterYProperty());
             }
 
+            // If the edge is not already in the edgeLayer
+            if(this.edgeHashMap.containsKeyPairBidirectional(graphNode, elementAdded)){
+                // Add edge to edge layer for rendering
+                this.edgeLayer.getChildren().add(edge);
+            }
+
+            // Add the new direction for edge
             this.edgeHashMap.putUnidirectional(graphNode, elementAdded, edge);
 
-            // Add edge to edge layer for rendering
-            this.edgeLayer.getChildren().add(edge);
+
         }
     }
 
@@ -123,7 +130,7 @@ public abstract class Graph extends Chart{
 
                     // Handle adjacencies
                     for(GraphNode other : graphNode.getAdjacencies()){
-                        System.out.println("Added: " + other.getName());
+                        System.out.println("Added: " + other.getLabelText());
 
                         // Add edges
                         Graph.this.createGraphEdgeUnidirectional(graphNode, other);

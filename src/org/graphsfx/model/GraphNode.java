@@ -5,6 +5,8 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.property.StringPropertyBase;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
@@ -67,6 +69,15 @@ public class GraphNode {
      */
     public void addAdjacency(GraphNode graphNode){
         this.adjacencies.add(graphNode);
+    }
+
+    /**
+     * Adds a bidirectional adjacency to the GraphNode
+     * @param graphNode node to add the bi directional adjacency
+     */
+    public void addBidirectionalAdjacency(GraphNode graphNode){
+        this.adjacencies.add(graphNode);
+        graphNode.addAdjacency(this);
     }
 
     public boolean removeAdjacency(GraphNode graphNode){
@@ -136,9 +147,9 @@ public class GraphNode {
      * Initializes all nodes
      */
     private void initialize(){
+        setCenterBindings();
         initAdjacencyListener();
         setDragPane();
-        setCenterBindings();
     }
 
     /**
@@ -170,16 +181,19 @@ public class GraphNode {
         this.pane.setOnMouseDragged(new javafx.event.EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                Pane thisPane = GraphNode.this.pane;
                 // Calculate coordinates relative to the graph Node.
-                double trueX = event.getSceneX() - GraphNode.this.pane.getScene().getX();
-                double trueY = event.getSceneY() - GraphNode.this.pane.getScene().getY();
+                double deltaX = event.getScreenX() - thisPane.localToScreen(thisPane.getBoundsInLocal()).getMinX();
+                double deltaY = event.getScreenY() - thisPane.localToScreen(thisPane.getBoundsInLocal()).getMinY();
+                double newX = thisPane.getLayoutX() + deltaX;
+                double newY = thisPane.getLayoutY() + deltaY;
 
                 // Prevent GraphNodes from being dragged offscreen
-                if(trueX >= 0 && (trueX + GraphNode.this.pane.getWidth()) <= GraphNode.this.getGraph().getWidth()) {
-                    GraphNode.this.pane.setLayoutX(trueX);
+                if(newX >= 0 && (newX + thisPane.getWidth()) <= GraphNode.this.getGraph().getWidth()) {
+                    GraphNode.this.pane.setLayoutX(newX);
                 }
-                if(trueY >= 0 && (trueY + GraphNode.this.pane.getHeight()) <= GraphNode.this.getGraph().getHeight()){
-                    GraphNode.this.pane.setLayoutY(trueY);
+                if(newY >= 0 && (newY + thisPane.getHeight()) <= GraphNode.this.getGraph().getHeight()){
+                    GraphNode.this.pane.setLayoutY(newY);
                 }
 
             }
@@ -192,6 +206,8 @@ public class GraphNode {
      */
     private void setCenterBindings(){
 
+        System.out.println("Width: " + pane.getPrefWidth() /2 );
+        System.out.println("Height: " + (pane.getPrefHeight() / 2));
         // Bind the layout x property to be offset by half the width
         DoubleBinding xBinding = new DoubleBinding() {
             {
@@ -199,8 +215,16 @@ public class GraphNode {
             }
             @Override
             protected double computeValue() {
-                return GraphNode.this.pane.layoutXProperty().get() +
-                        (GraphNode.this.pane.getBoundsInLocal().getWidth() / 2);
+                double x = GraphNode.this.pane.layoutXProperty().get();
+
+                // Work around to correctly place edges before Graphnode is rendered
+                if(GraphNode.this.pane.getWidth() == 0 ){
+                    x += GraphNode.this.pane.getPrefWidth() / 2;
+                }
+                else{
+                    x += GraphNode.this.pane.getWidth() / 2;
+                }
+                return x;
             }
         };
 
@@ -211,8 +235,16 @@ public class GraphNode {
             }
             @Override
             protected double computeValue() {
-                return GraphNode.this.pane.layoutYProperty().get() +
-                        (GraphNode.this.pane.getBoundsInLocal().getHeight() / 2);
+                double y = GraphNode.this.pane.layoutYProperty().get();
+
+                // Work around to correctly place edges before Graphnode is rendered
+                if(GraphNode.this.pane.getHeight() == 0){
+                    y += GraphNode.this.pane.getPrefHeight() / 2;
+                }
+                else{
+                    y += GraphNode.this.pane.getWidth() / 2;
+                }
+                return y;
             }
         };
 
@@ -269,9 +301,15 @@ public class GraphNode {
      */
     private ObservableSet<GraphNode> adjacencies = FXCollections.observableSet();
 
+    /**
+     * The center X and Y coordinates for the
+     */
     private DoubleProperty centerX = new SimpleDoubleProperty();
     private DoubleProperty centerY = new SimpleDoubleProperty();
 
+    /**
+     * Private default sizes
+     */
     private static final double DEFAULT_PANE_HEIGHT = 20.0;
     private static final double DEFAULT_PANE_WIDTH = 20.0;
     private static final double DEFAULT_BORDER_WIDTH = 3.0;
