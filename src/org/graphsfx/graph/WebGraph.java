@@ -4,8 +4,6 @@ import org.graphsfx.model.GraphNode;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * Created by TheFirstGuy on 10/9/2017.
@@ -50,7 +48,7 @@ public class WebGraph extends Graph {
 
             layoutChildren(rootNode, placed, layedOut);
         }
-
+        centerGraph();
 
     }
 
@@ -81,10 +79,6 @@ public class WebGraph extends Graph {
         double x,y;
         GraphNode currentNode;
         double edgeLength;
-        double minX = 0;
-        double minY = 0;
-        double maxX = 0;
-        double maxY = 0;
 
 
         System.out.println(graphNode.getLabelText());
@@ -101,21 +95,30 @@ public class WebGraph extends Graph {
                 edgeLength = this.edgeLength;
             }
 
+            // Place the node
             if(!placed.contains(currentNode)){
-                radians = (1.0 / graphNode.getAdjacencies().size()) * counter * (2 * Math.PI);
-                System.out.println("Radians: " + radians);
-                System.out.println("DeltaX: " + Math.cos(radians) + " DeltaY: " + Math.sin(radians) );
-                x = graphNode.getPane().getLayoutX() + (edgeLength * Math.cos(radians));
-                y = graphNode.getPane().getLayoutY() + (edgeLength * Math.sin(radians));
-                System.out.println("X: " + x + " Y: " + y );
-                currentNode.getPane().setLayoutX(x);
-                currentNode.getPane().setLayoutY(y);
-                placed.add(currentNode);
+
+                do{
+                    // Calculate the angle from the originating node
+                    radians = (1.0 / graphNode.getAdjacencies().size()) * counter * (2 * Math.PI);
+                    x = graphNode.getPane().getLayoutX() + (edgeLength * Math.cos(radians));
+                    y = graphNode.getPane().getLayoutY() + (edgeLength * Math.sin(radians));
+
+                    // Set the coordinates
+                    currentNode.getPane().setLayoutX(x);
+                    currentNode.getPane().setLayoutY(y);
+
+                    // place the nodes
+                    placed.add(currentNode);
+
+                    counter++;
+                }while(checkCollision(currentNode));
             }
 
-            counter++;
+
         }
 
+        //  Recursively layout the children of the current node
         itr = graphNode.getAdjacencies().iterator();
         while(itr.hasNext()){
             currentNode = itr.next();
@@ -123,6 +126,8 @@ public class WebGraph extends Graph {
                 layoutChildren(currentNode, placed, layedOut);
             }
         }
+
+
 
     }
     // Private Fields ==================================================================================================

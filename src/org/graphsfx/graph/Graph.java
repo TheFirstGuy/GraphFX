@@ -3,13 +3,15 @@ package org.graphsfx.graph;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
-import javafx.scene.Group;
+import javafx.geometry.BoundingBox;
+import javafx.geometry.Bounds;
 import javafx.scene.chart.Chart;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
 import org.graphsfx.model.GraphEdge;
 import org.graphsfx.model.GraphNode;
 import org.graphsfx.util.TwoKeyMap;
+
+import java.util.Iterator;
 
 /**
  * Created by Urs on 9/23/2017.
@@ -160,6 +162,74 @@ public abstract class Graph extends Chart{
                 }
             }
         });
+    }
+
+    /**
+     * Shifts all graph nodes to be "on screen" by finding the extreme minimum node coordinates and translating
+     * all nodes so that those coordinates are not negative. No shift will occur if all node coordinates are positive.
+     */
+    protected void centerGraph(){
+        double minX = 0;
+        double minY = 0;
+        double layoutX = 0;
+        double layoutY = 0;
+        Iterator<GraphNode> itr = this.graphNodes.iterator();
+        GraphNode currentNode;
+
+        // Find the minimum coordinates
+        while(itr.hasNext()){
+            currentNode = itr.next();
+            layoutX = currentNode.getPane().getLayoutX();
+            layoutY = currentNode.getPane().getLayoutY();
+
+            minX = (layoutX < minX) ? layoutX : minX;
+            minY = (layoutY < minY) ? layoutY : minY;
+        }
+
+        // Translate all nodes by at least the minX and minY
+        itr = this.graphNodes.iterator();
+        while(itr.hasNext()){
+            currentNode = itr.next();
+            layoutX = currentNode.getPane().getLayoutX() + Math.abs(minX);
+            layoutY = currentNode.getPane().getLayoutY() + Math.abs(minY);
+            currentNode.getPane().setLayoutX(layoutX);
+            currentNode.getPane().setLayoutY(layoutY);
+        }
+    }
+
+    /**
+     * Checks if the given node collides with a node that is already placed. This is a brute force method and should
+     * be reworked with a spactial hashmap
+     * @param graphNode The node to verify collision against
+     * @return 'true' if the graphnode collides with an existing node. 'false' otherwise.
+     **/
+    protected boolean checkCollision(GraphNode graphNode){
+        boolean collides = false;
+        Iterator<GraphNode> itr = this.graphNodes.iterator();
+        Bounds newBounds = new BoundingBox(graphNode.getPane().getLayoutX(),
+                                graphNode.getPane().getLayoutY(),
+                                graphNode.getPane().getPrefWidth(),
+                                graphNode.getPane().getPrefHeight());
+        Bounds currentBounds;
+        GraphNode currentNode;
+
+        // Loop through and check against all other nodes
+        while(itr.hasNext() && !collides){
+            currentNode = itr.next();
+            // Do not check against self
+            if(currentNode != graphNode){
+                currentBounds = new BoundingBox(currentNode.getPane().getLayoutX(),
+                                    currentNode.getPane().getLayoutY(),
+                                    currentNode.getPane().getPrefWidth(),
+                                    currentNode.getPane().getPrefHeight());
+                if(newBounds.intersects(currentBounds)){
+                    System.out.println("CurrentBounds: " + currentBounds + " NewBounds: " + newBounds);
+                    collides = true;
+                }
+            }
+        }
+
+        return collides;
     }
 
     // Protected Fields ================================================================================================
