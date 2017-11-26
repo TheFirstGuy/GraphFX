@@ -6,11 +6,13 @@ import javafx.collections.SetChangeListener;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.scene.chart.Chart;
+import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import org.graphsfx.model.GraphEdge;
 import org.graphsfx.model.GraphNode;
 import org.graphsfx.util.TwoKeyMap;
 
+import java.util.HashSet;
 import java.util.Iterator;
 
 /**
@@ -19,14 +21,7 @@ import java.util.Iterator;
 public abstract class Graph extends Chart{
 
 
-    public Graph(){
 
-        this.getChildren().add(this.edgeLayer);
-        this.getChildren().add(this.graphNodeLayer);
-
-        initializeListeners();
-
-    }
 
     // Public Methods ==================================================================================================
 
@@ -36,6 +31,16 @@ public abstract class Graph extends Chart{
      */
     public void addGraphNode(GraphNode graphNode){
         this.graphNodes.add(graphNode);
+    }
+
+    /**
+     * Removes a GraphNode to be rendered
+     * @param graphNode The node to be removed
+     */
+    public void removeGraphNode(GraphNode graphNode){
+        if(this.graphNodes.contains(graphNode)){
+            this.graphNodes.remove(graphNode);
+        }
     }
 
     public void nodeNameChanged(){
@@ -78,14 +83,19 @@ public abstract class Graph extends Chart{
                 edge.setDestBindings(elementAdded.getCenterXProperty(), elementAdded.getCenterYProperty());
             }
 
-            // If the edge is not already in the edgeLayer
-            if(this.edgeHashMap.containsKeyPairBidirectional(graphNode, elementAdded)){
-                // Add edge to edge layer for rendering
-                this.edgeLayer.getChildren().add(edge);
-            }
-
             // Add the new direction for edge
             this.edgeHashMap.putUnidirectional(graphNode, elementAdded, edge);
+
+            // If the edge is not already in the edgeLayer
+            if(!this.edgeLayer.getChildren().contains(edge)){
+                // Add edge to edge layer for rendering
+                this.edgeLayer.getChildren().add(edge);
+                System.out.println("Edge added");
+            } else{
+                System.out.println("Edge already exists");
+            }
+
+
 
 
         }
@@ -108,14 +118,50 @@ public abstract class Graph extends Chart{
      * @param elementRemoved destination of the edge to be removed
      */
     public void removeGraphEdgeUnidirectional(GraphNode graphNode, GraphNode elementRemoved) {
+        if(this.edgeHashMap.containsKeyPairBidirectional(graphNode, elementRemoved)){ System.out.println("Contains Pair!");}
         GraphEdge edge = this.edgeHashMap.removeUnidirectional(graphNode, elementRemoved);
-
+        if(this.edgeHashMap.containsKeyPairBidirectional(graphNode, elementRemoved)){ System.out.println("Still Contains Pair!");}
+        else{ System.out.println("Removed pair");}
         // Check if the edge needs to be removed from rendering
         if(edge != null && !this.edgeHashMap.containsKeyPairBidirectional(graphNode, elementRemoved)){
             this.edgeLayer.getChildren().remove(edge);
         }
     }
 
+    public int getNumNodes(){return this.graphNodes.size();}
+
+    public double getPaneWidth(){
+        return this.graphNodeLayer.getPrefWidth();
+    }
+
+    public double getPaneHeight(){
+        return this.graphNodeLayer.getPrefHeight();
+    }
+
+    // Protected Methods ===============================================================================================
+    protected Graph(){
+
+        // Add children layers
+        this.getChildren().add(this.edgeLayer);
+        this.getChildren().add(this.graphNodeLayer);
+        this.getChildren().add(this.labelLayer);
+
+        // Bind the child layers to the size of the graph
+        this.edgeLayer.prefHeightProperty().bind(this.prefHeightProperty());
+        this.edgeLayer.prefWidthProperty().bind(this.prefWidthProperty());
+        this.graphNodeLayer.prefHeightProperty().bind(this.prefHeightProperty());
+        this.graphNodeLayer.prefWidthProperty().bind(this.prefWidthProperty());
+        this.labelLayer.prefHeightProperty().bind(this.prefHeightProperty());
+        this.labelLayer.prefWidthProperty().bind(this.prefWidthProperty());
+
+        // allow labellayer to be clicked through
+        this.labelLayer.setPickOnBounds(false);
+
+        this.labelLayer.setStyle("-fx-border-style: solid; " +
+                "-fx-background-color: #000000;");
+        initializeListeners();
+
+    }
     // Private Methods =================================================================================================
 
     /**
@@ -142,8 +188,10 @@ public abstract class Graph extends Chart{
 
                     }
 
-                    // Add to graph layer
+                    // Add to rendering layers
                     Graph.this.graphNodeLayer.getChildren().add(graphNode.getPane());
+                    Graph.this.layoutLabel(graphNode);
+
 
                 }
                 else if(change.wasRemoved()){
@@ -153,11 +201,12 @@ public abstract class Graph extends Chart{
                     for(GraphNode other : graphNode.getAdjacencies()){
 
                         // Remove edges bidirectionally
-                        Graph.this.removeGraphEdgeBidirectional(graphNode, other);
+                        Graph.this.removeGraphEdgeBidirectional( other, graphNode);
                     }
 
                     // Remove from rendering
                     Graph.this.graphNodeLayer.getChildren().remove(graphNode.getPane());
+                    Graph.this.labelLayer.getChildren().remove(graphNode.getLabel());
                     graphNode.setGraph(null);
                 }
             }
@@ -228,8 +277,29 @@ public abstract class Graph extends Chart{
                 }
             }
         }
-
         return collides;
+    }
+
+    /**
+     * Laysout the graphnode's label
+     * @param graphNode The source graphnode to label
+     */
+    protected void layoutLabel(GraphNode graphNode){
+        Label label = graphNode.getLabel();
+
+        // Check that the label hasnt been layedout already
+        if(!this.labelLayer.getChildren().contains(label)){
+            // Bind to nodes layout property
+            label.layoutXProperty().bind(graphNode.getPane().layoutXProperty());
+            label.layoutYProperty().bind(graphNode.getCenterYProperty());
+
+            // Set translation (offset)
+            label.setTranslateX(graphNode.getPane().getPrefWidth() * 1.1);
+
+            // Add to label pane
+            this.labelLayer.getChildren().add(label);
+            //this.labels.add(label);
+        }
     }
 
     // Protected Fields ================================================================================================
@@ -241,6 +311,12 @@ public abstract class Graph extends Chart{
     protected Pane edgeLayer = new Pane();
 
     protected Pane graphNodeLayer = new Pane();
+
+    protected Pane labelLayer = new Pane();
+
+    protected HashSet<GraphNode> placed = new HashSet<>();
+
+    protected HashSet<GraphNode> layedOut = new HashSet<>();
 
     protected GraphEdge.PathType pathType = GraphEdge.PathType.STRAIGHT;
 }

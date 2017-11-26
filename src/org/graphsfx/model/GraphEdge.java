@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Point2D;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 
 /**
@@ -59,6 +60,9 @@ public class GraphEdge extends Path{
         getElements().add(this.moveTo);
         getElements().add(this.pathElement);
         setStrokeWidth(3);
+
+        // Set default color to gray
+        setStroke(Color.valueOf("#c2c3c4"));
         //this.getElements().addAll(this.closePath);
     }
 

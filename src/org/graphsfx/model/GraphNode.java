@@ -5,8 +5,6 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.property.StringPropertyBase;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
@@ -136,6 +134,14 @@ public class GraphNode {
 
     public void setPane(Pane pane){
         this.pane = pane;
+    }
+
+    public Label getLabel() {
+        return this.label;
+    }
+
+    public void setLabel(Label label){
+        this.label = label;
     }
 
     // Private Methods =================================================================================================

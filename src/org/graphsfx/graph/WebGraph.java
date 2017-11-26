@@ -2,7 +2,6 @@ package org.graphsfx.graph;
 
 import org.graphsfx.model.GraphNode;
 
-import java.util.HashSet;
 import java.util.Iterator;
 
 /**
@@ -19,6 +18,7 @@ public class WebGraph extends Graph {
     @Override
     protected void layoutChartChildren(double top, double left, double width, double height) {
 
+        System.out.println("Layout out children");
         // Snap top and left
         top = snapPosition(top);
         left = snapPosition(left);
@@ -29,27 +29,27 @@ public class WebGraph extends Graph {
         double centerX = width / 2;
         double centerY = height / 2;
 
-        // Use the first Node in the graph as a starting point. Assumes that the graph is fully connected.
-        System.out.println("Number of GraphNodes: " + this.graphNodes.size());
-        if(!this.graphNodes.isEmpty()){
-            GraphNode rootNode;
-            Iterator<GraphNode> itr = this.graphNodes.iterator();
+        // Loop through all graphnodes and lay them out if they havent been layed out yet
+        GraphNode rootNode;
+        Iterator<GraphNode> itr = this.graphNodes.iterator();
+        while(itr.hasNext()) {
             // Center first GraphNode
 
             rootNode = itr.next();
-            rootNode.getPane().setLayoutX(centerX);
-            rootNode.getPane().setLayoutY(centerY);
+            if(!placed.contains(rootNode)) {
 
-            HashSet<GraphNode> placed = new HashSet<>();
-            HashSet<GraphNode> layedOut = new HashSet<>();
+                rootNode.getPane().setLayoutX(centerX);
+                rootNode.getPane().setLayoutY(centerY);
 
-            // Use Depth First Search to traverse Graph
-            placed.add(rootNode);
+                // Use Depth First Search to traverse Graph
+                this.placed.add(rootNode);
+                layoutLabel(rootNode);
+                layoutChildren(rootNode);
+            }
 
-            layoutChildren(rootNode, placed, layedOut);
         }
-        centerGraph();
 
+        centerGraph();
     }
 
     // Getters & Setters ===============================================================================================
@@ -72,7 +72,11 @@ public class WebGraph extends Graph {
 
     // Private Methods =================================================================================================
 
-    private void layoutChildren(GraphNode graphNode, HashSet<GraphNode> placed, HashSet<GraphNode> layedOut){
+    /**
+     * Recursively laysout the given graphnode's children
+     * @param graphNode The parent graphnode which has already been placed.
+     */
+    private void layoutChildren(GraphNode graphNode){
         double radians;
         Iterator<GraphNode> itr = graphNode.getAdjacencies().iterator();
         int counter = 0;
@@ -80,9 +84,6 @@ public class WebGraph extends Graph {
         GraphNode currentNode;
         double edgeLength;
 
-
-        System.out.println(graphNode.getLabelText());
-        System.out.println(graphNode.getAdjacencies().size());
         layedOut.add(graphNode);
         while(itr.hasNext()){
             currentNode = itr.next();
@@ -96,7 +97,7 @@ public class WebGraph extends Graph {
             }
 
             // Place the node
-            if(!placed.contains(currentNode)){
+            if(!this.placed.contains(currentNode)){
 
                 do{
                     // Calculate the angle from the originating node
@@ -109,10 +110,11 @@ public class WebGraph extends Graph {
                     currentNode.getPane().setLayoutY(y);
 
                     // place the nodes
-                    placed.add(currentNode);
+                    this.placed.add(currentNode);
 
                     counter++;
                 }while(checkCollision(currentNode));
+                layoutLabel(currentNode);
             }
 
 
@@ -122,14 +124,13 @@ public class WebGraph extends Graph {
         itr = graphNode.getAdjacencies().iterator();
         while(itr.hasNext()){
             currentNode = itr.next();
-            if(!layedOut.contains(currentNode)){
-                layoutChildren(currentNode, placed, layedOut);
+            if(!this.layedOut.contains(currentNode)){
+                layoutChildren(currentNode);
             }
         }
-
-
-
     }
+
+
     // Private Fields ==================================================================================================
 
     private double edgeLength;
