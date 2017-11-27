@@ -7,6 +7,7 @@ import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.scene.chart.Chart;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
 import org.graphsfx.model.GraphEdge;
 import org.graphsfx.model.GraphNode;
@@ -168,6 +169,8 @@ public abstract class Graph extends Chart{
      * Initializes listeners for Graph Fields
      */
     private void initializeListeners(){
+
+        // Handles the addition and removal of graphnodes
         this.graphNodes.addListener(new SetChangeListener<GraphNode>() {
             @Override
             public void onChanged(Change<? extends GraphNode> change) {
@@ -211,6 +214,55 @@ public abstract class Graph extends Chart{
                 }
             }
         });
+
+        // Handles graph panning
+        setOnMouseDragged(event -> {
+            if(this.dragData.valid){
+                System.out.println("Dragging LastX: " + dragData.lastX + " LastY: " + dragData.lastY);
+                System.out.println("ScreenX: " + event.getScreenX() + " ScreenY: " + event.getScreenY());
+                double deltaX = this.dragData.deltaX(event.getScreenX());
+                double deltaY = this.dragData.deltaY(event.getScreenY());
+
+                System.out.println("DeltaX: " + deltaX + " DeltaY: " + deltaY);
+                // Move all graphNodes by the deltas
+                Iterator<GraphNode> itr = this.graphNodes.iterator();
+                GraphNode currentNode;
+                double layoutX, layoutY;
+
+                while(itr.hasNext()){
+                    currentNode = itr.next();
+                    layoutX = currentNode.getPane().getLayoutX() - deltaX;
+                    layoutY = currentNode.getPane().getLayoutY() - deltaY;
+                    System.out.println("New X: " + layoutX + " New Y: " + layoutY);
+                    currentNode.getPane().setLayoutX(layoutX);
+                    currentNode.getPane().setLayoutY(layoutY);
+                }
+            }
+            else{
+                if(event.getButton() == MouseButton.SECONDARY) {
+                    this.dragData.valid = true;
+                    this.dragData.lastX = event.getScreenX();
+                    this.dragData.lastY = event.getScreenY();
+                    System.out.println("Drag Entered. X: " + dragData.lastX + " Y: " + dragData.lastY);
+                }
+            }
+        });
+
+        setOnMouseReleased(event -> {
+            System.out.println("Drag Exit");
+            if(event.getButton() == MouseButton.SECONDARY) {
+                this.dragData.valid = false;
+            }
+        });
+
+        // Handles centering the graph once placed
+        setOnMouseClicked(event -> {
+            // If double right click
+            if(event.getButton() == MouseButton.SECONDARY &&
+                    event.getClickCount() == 2){
+                centerGraph();
+            }
+        });
     }
 
     /**
@@ -218,8 +270,8 @@ public abstract class Graph extends Chart{
      * all nodes so that those coordinates are not negative. No shift will occur if all node coordinates are positive.
      */
     protected void centerGraph(){
-        double minX = 0;
-        double minY = 0;
+        double minX = Double.MAX_VALUE;
+        double minY = Double.MAX_VALUE;
         double layoutX = 0;
         double layoutY = 0;
         Iterator<GraphNode> itr = this.graphNodes.iterator();
@@ -235,12 +287,15 @@ public abstract class Graph extends Chart{
             minY = (layoutY < minY) ? layoutY : minY;
         }
 
+        // Adjust the min values so they can be added
+        minX *= -1;
+        minY *= -1;
         // Translate all nodes by at least the minX and minY
         itr = this.graphNodes.iterator();
         while(itr.hasNext()){
             currentNode = itr.next();
-            layoutX = currentNode.getPane().getLayoutX() + Math.abs(minX);
-            layoutY = currentNode.getPane().getLayoutY() + Math.abs(minY);
+            layoutX = currentNode.getPane().getLayoutX() + minX;
+            layoutY = currentNode.getPane().getLayoutY() + minY;
             currentNode.getPane().setLayoutX(layoutX);
             currentNode.getPane().setLayoutY(layoutY);
         }
@@ -302,6 +357,32 @@ public abstract class Graph extends Chart{
         }
     }
 
+    /**
+     * Sets the preferred width and height of the graph based on the coordates of the rightmost node.
+     */
+    protected void autoSizeGraph(){
+        double maxX = Double.MIN_VALUE;
+        double maxY = Double.MIN_VALUE;
+        double layoutX = 0;
+        double layoutY = 0;
+        Iterator<GraphNode> itr = this.graphNodes.iterator();
+        GraphNode currentNode;
+
+        // Find the minimum coordinates
+        while(itr.hasNext()){
+            currentNode = itr.next();
+            layoutX = currentNode.getPane().getLayoutX();
+            layoutY = currentNode.getPane().getLayoutY();
+
+            maxX = (layoutX > maxX) ? layoutX : maxX;
+            maxY = (layoutY > maxY) ? layoutY : maxY;
+        }
+
+        setPrefWidth(maxX);
+        setPrefHeight(maxY);
+
+    }
+
     // Protected Fields ================================================================================================
 
     protected ObservableSet<GraphNode> graphNodes = FXCollections.observableSet();
@@ -319,4 +400,49 @@ public abstract class Graph extends Chart{
     protected HashSet<GraphNode> layedOut = new HashSet<>();
 
     protected GraphEdge.PathType pathType = GraphEdge.PathType.STRAIGHT;
+
+    protected MouseDragData dragData= new MouseDragData();
+
+    // Inner Classes ===================================================================================================
+
+    /**
+     * Data structure tracking data needed to pan the graph on mouse drag
+     */
+    class MouseDragData{
+
+
+        /**
+         * Calculates the delta X and sets the lastX to the current X
+         * @param currentX the current X coordinate of the mouse
+         * @return the delta x
+         */
+        public double deltaX(double currentX){
+            double deltaX = this.lastX - currentX;
+            this.lastX = currentX;
+            return deltaX;
+        }
+
+        /**
+         * Calculates the delta Y and sets the lastY to the current Y
+         * @param currentY the current Y coordinate of the mouse
+         * @return the delta y
+         */
+        public double deltaY(double currentY){
+            double deltaY = this.lastY - currentY;
+            this.lastY = currentY;
+            return deltaY;
+        }
+
+        /**
+         * Flag determining if the data is valid (if for the current mouse drag)
+         */
+        public boolean valid = false;
+
+        /**
+         * The last known position of the mouse
+         */
+        public double lastX = Double.NaN;
+        public double lastY = Double.NaN;
+
+    }
 }

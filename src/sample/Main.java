@@ -17,7 +17,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         VBox root = (VBox) FXMLLoader.load(getClass().getResource("sample.fxml"));
-        AnchorPane anchor = (AnchorPane) root.lookup("#anchorPane");
+        AnchorPane graphPane = (AnchorPane) root.lookup("#GraphParent");
 
         primaryStage.setTitle("Hello World");
         primaryStage.setScene(new Scene(root, 500, 500));
@@ -45,15 +45,21 @@ public class Main extends Application {
         test8.addBidirectionalAdjacency(test1);
 
         WebGraph webGraph = new WebGraph();
-        anchor.prefHeightProperty().bind(root.heightProperty());
-        anchor.prefWidthProperty().bind(root.widthProperty());
-        webGraph.prefHeightProperty().bind(anchor.heightProperty());
-        webGraph.prefWidthProperty().bind(anchor.widthProperty());
+        graphPane.prefHeightProperty().bind(root.heightProperty());
+        graphPane.prefWidthProperty().bind(root.widthProperty());
+        //graphPane.setFitToHeight(true);
+        //graphPane.setFitToWidth(true);
+        graphPane.setPickOnBounds(false);
+//        graphPane.addEventHandler(MouseEvent.ANY, event -> {
+//            if(event.getButton() != MouseButton.MIDDLE){
+//                event.consume();
+//            }
+//        });
         //webGraph.setStyle("-fx-border-style: solid");
 
         webGraph.addGraphNode(test4);
 
-        anchor.getChildren().add(webGraph);
+        graphPane.getChildren().add(webGraph);
 
 //        test1.getPane().setLayoutX(15);
 //        test1.getPane().setLayoutY(50);

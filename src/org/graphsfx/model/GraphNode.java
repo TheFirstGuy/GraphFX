@@ -194,13 +194,9 @@ public class GraphNode {
                 double newX = thisPane.getLayoutX() + deltaX;
                 double newY = thisPane.getLayoutY() + deltaY;
 
-                // Prevent GraphNodes from being dragged offscreen
-                if(newX >= 0 && (newX + thisPane.getWidth()) <= GraphNode.this.getGraph().getWidth()) {
-                    GraphNode.this.pane.setLayoutX(newX);
-                }
-                if(newY >= 0 && (newY + thisPane.getHeight()) <= GraphNode.this.getGraph().getHeight()){
-                    GraphNode.this.pane.setLayoutY(newY);
-                }
+                GraphNode.this.pane.setLayoutX(newX);
+                GraphNode.this.pane.setLayoutY(newY);
+
 
             }
         });

@@ -50,6 +50,7 @@ public class WebGraph extends Graph {
         }
 
         centerGraph();
+        autoSizeGraph();
     }
 
     // Getters & Setters ===============================================================================================
