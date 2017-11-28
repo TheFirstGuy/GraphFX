@@ -9,9 +9,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import javafx.scene.control.Label;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import org.graphsfx.graph.Graph;
+import org.graphsfx.util.MouseDragData;
 
 import java.util.Collections;
 import java.util.Set;
@@ -184,21 +184,49 @@ public class GraphNode {
      */
     private void setDragPane(){
 
-        this.pane.setOnMouseDragged(new javafx.event.EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                Pane thisPane = GraphNode.this.pane;
-                // Calculate coordinates relative to the graph Node.
-                double deltaX = event.getScreenX() - thisPane.localToScreen(thisPane.getBoundsInLocal()).getMinX();
-                double deltaY = event.getScreenY() - thisPane.localToScreen(thisPane.getBoundsInLocal()).getMinY();
-                double newX = thisPane.getLayoutX() + deltaX;
-                double newY = thisPane.getLayoutY() + deltaY;
+//        this.pane.setOnMouseDragged(new javafx.event.EventHandler<MouseEvent>() {
+//            @Override
+//            public void handle(MouseEvent event) {
+//                Pane thisPane = GraphNode.this.pane;
+//                // Calculate coordinates relative to the graph Node.
+//                double deltaX = event.getScreenX() - thisPane.localToScreen(thisPane.getBoundsInLocal()).getMinX();
+//                double deltaY = event.getScreenY() - thisPane.localToScreen(thisPane.getBoundsInLocal()).getMinY();
+//                double newX = thisPane.getLayoutX() + deltaX;
+//                double newY = thisPane.getLayoutY() + deltaY;
+//
+//                GraphNode.this.pane.setLayoutX(newX);
+//                GraphNode.this.pane.setLayoutY(newY);
+//
+//
+//            }
+//        });
 
-                GraphNode.this.pane.setLayoutX(newX);
-                GraphNode.this.pane.setLayoutY(newY);
+        this.pane.setOnMouseDragged(event -> {
+            if(this.dragData.valid){
+                double deltaX = this.dragData.deltaX(event.getScreenX());
+                double deltaY = this.dragData.deltaY(event.getScreenY());
 
+                // Account for scaling
+                deltaX /= this.getGraph().getScaleX();
+                deltaY /= this.getGraph().getScaleY();
 
+                // Calculate new layout
+                double layoutX = this.pane.getLayoutX() - deltaX;
+                double layoutY = this.pane.getLayoutY() - deltaY;
+
+                this.pane.setLayoutX(layoutX);
+                this.pane.setLayoutY(layoutY);
             }
+            else{
+                this.dragData.valid = true;
+                this.dragData.lastX = event.getScreenX();
+                this.dragData.lastY = event.getScreenY();
+            }
+        });
+
+        this.pane.setOnMouseReleased(event -> {
+            this.dragData.valid = false;
+
         });
 
     }
@@ -308,6 +336,11 @@ public class GraphNode {
      */
     private DoubleProperty centerX = new SimpleDoubleProperty();
     private DoubleProperty centerY = new SimpleDoubleProperty();
+
+    /**
+     * Mouse drag data to support dragging the node
+     */
+    private MouseDragData dragData = new MouseDragData();
 
     /**
      * Private default sizes

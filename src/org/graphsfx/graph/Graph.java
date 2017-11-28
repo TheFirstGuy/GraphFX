@@ -11,6 +11,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
 import org.graphsfx.model.GraphEdge;
 import org.graphsfx.model.GraphNode;
+import org.graphsfx.util.MouseDragData;
 import org.graphsfx.util.TwoKeyMap;
 
 import java.util.HashSet;
@@ -22,7 +23,8 @@ import java.util.Iterator;
 public abstract class Graph extends Chart{
 
 
-
+    private static double DEFAULT_SCALING = 0.01;
+    private static double MAX_SCALING = 3.0;
 
     // Public Methods ==================================================================================================
 
@@ -218,12 +220,13 @@ public abstract class Graph extends Chart{
         // Handles graph panning
         setOnMouseDragged(event -> {
             if(this.dragData.valid){
-                System.out.println("Dragging LastX: " + dragData.lastX + " LastY: " + dragData.lastY);
-                System.out.println("ScreenX: " + event.getScreenX() + " ScreenY: " + event.getScreenY());
                 double deltaX = this.dragData.deltaX(event.getScreenX());
                 double deltaY = this.dragData.deltaY(event.getScreenY());
 
-                System.out.println("DeltaX: " + deltaX + " DeltaY: " + deltaY);
+                // Account for scaling
+                deltaX /= getScaleX();
+                deltaY /= getScaleY();
+
                 // Move all graphNodes by the deltas
                 Iterator<GraphNode> itr = this.graphNodes.iterator();
                 GraphNode currentNode;
@@ -233,7 +236,6 @@ public abstract class Graph extends Chart{
                     currentNode = itr.next();
                     layoutX = currentNode.getPane().getLayoutX() - deltaX;
                     layoutY = currentNode.getPane().getLayoutY() - deltaY;
-                    System.out.println("New X: " + layoutX + " New Y: " + layoutY);
                     currentNode.getPane().setLayoutX(layoutX);
                     currentNode.getPane().setLayoutY(layoutY);
                 }
@@ -243,13 +245,11 @@ public abstract class Graph extends Chart{
                     this.dragData.valid = true;
                     this.dragData.lastX = event.getScreenX();
                     this.dragData.lastY = event.getScreenY();
-                    System.out.println("Drag Entered. X: " + dragData.lastX + " Y: " + dragData.lastY);
                 }
             }
         });
 
         setOnMouseReleased(event -> {
-            System.out.println("Drag Exit");
             if(event.getButton() == MouseButton.SECONDARY) {
                 this.dragData.valid = false;
             }
@@ -261,6 +261,20 @@ public abstract class Graph extends Chart{
             if(event.getButton() == MouseButton.SECONDARY &&
                     event.getClickCount() == 2){
                 centerGraph();
+            }
+        });
+
+        // Handles graph zooming
+        setOnScroll(event -> {
+            double scaleX = getScaleX() + (event.getDeltaY() * DEFAULT_SCALING);
+            double scaleY = getScaleY() + (event.getDeltaY() * DEFAULT_SCALING);
+
+            if( scaleX > 0 &&
+                scaleY > 0 &&
+                scaleX < MAX_SCALING &&
+                scaleY < MAX_SCALING) {
+                setScaleX(scaleX);
+                setScaleY(scaleY);
             }
         });
     }
@@ -405,44 +419,5 @@ public abstract class Graph extends Chart{
 
     // Inner Classes ===================================================================================================
 
-    /**
-     * Data structure tracking data needed to pan the graph on mouse drag
-     */
-    class MouseDragData{
 
-
-        /**
-         * Calculates the delta X and sets the lastX to the current X
-         * @param currentX the current X coordinate of the mouse
-         * @return the delta x
-         */
-        public double deltaX(double currentX){
-            double deltaX = this.lastX - currentX;
-            this.lastX = currentX;
-            return deltaX;
-        }
-
-        /**
-         * Calculates the delta Y and sets the lastY to the current Y
-         * @param currentY the current Y coordinate of the mouse
-         * @return the delta y
-         */
-        public double deltaY(double currentY){
-            double deltaY = this.lastY - currentY;
-            this.lastY = currentY;
-            return deltaY;
-        }
-
-        /**
-         * Flag determining if the data is valid (if for the current mouse drag)
-         */
-        public boolean valid = false;
-
-        /**
-         * The last known position of the mouse
-         */
-        public double lastX = Double.NaN;
-        public double lastY = Double.NaN;
-
-    }
 }
