@@ -141,6 +141,10 @@ public abstract class Graph extends Chart{
 
     public void setPannable(boolean pannable){this.pannable = pannable;}
 
+    public boolean isZoomable(){return  this.zoomable;}
+
+    public void setZoomable(boolean zoomable){this.zoomable = zoomable;}
+
     public double getPaneWidth(){
         return this.graphNodeLayer.getPrefWidth();
     }
@@ -274,15 +278,17 @@ public abstract class Graph extends Chart{
 
         // Handles graph zooming
         setOnScroll(event -> {
-            double scaleX = getScaleX() + (event.getDeltaY() * DEFAULT_SCALING);
-            double scaleY = getScaleY() + (event.getDeltaY() * DEFAULT_SCALING);
+            if(this.zoomable) {
+                double scaleX = getScaleX() + (event.getDeltaY() * DEFAULT_SCALING);
+                double scaleY = getScaleY() + (event.getDeltaY() * DEFAULT_SCALING);
 
-            if( scaleX > 0 &&
-                scaleY > 0 &&
-                scaleX < MAX_SCALING &&
-                scaleY < MAX_SCALING) {
-                setScaleX(scaleX);
-                setScaleY(scaleY);
+                if (scaleX > 0 &&
+                        scaleY > 0 &&
+                        scaleX < MAX_SCALING &&
+                        scaleY < MAX_SCALING) {
+                    setScaleX(scaleX);
+                    setScaleY(scaleY);
+                }
             }
         });
     }
@@ -427,6 +433,8 @@ public abstract class Graph extends Chart{
     protected  boolean draggable = true;
 
     protected  boolean pannable = true;
+
+    protected boolean zoomable = true;
 
     // Inner Classes ===================================================================================================
 

@@ -1,11 +1,8 @@
 package sample;
 
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -45,47 +42,39 @@ public class Main extends Application {
         test8.addBidirectionalAdjacency(test1);
 
         WebGraph webGraph = new WebGraph();
-        graphPane.prefHeightProperty().bind(root.heightProperty());
-        graphPane.prefWidthProperty().bind(root.widthProperty());
-        //graphPane.setFitToHeight(true);
-        //graphPane.setFitToWidth(true);
+        graphPane.prefWidthProperty().bind(graphPane.widthProperty());
+        graphPane.prefHeightProperty().bind(graphPane.heightProperty());
         graphPane.setPickOnBounds(false);
-//        graphPane.addEventHandler(MouseEvent.ANY, event -> {
-//            if(event.getButton() != MouseButton.MIDDLE){
-//                event.consume();
-//            }
-//        });
-        //webGraph.setStyle("-fx-border-style: solid");
 
         webGraph.addGraphNode(test4);
 
         graphPane.getChildren().add(webGraph);
 
 
-        Button removeBtn = new Button("Remove Node");
-        removeBtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                webGraph.removeGraphNode(test4);
-                System.out.println("Width: " + webGraph.getPaneWidth() + " Height: " + webGraph.getPaneHeight());
-                System.out.println("Size: " + webGraph.getNumNodes());
-            }
-        });
-
-        Button addBtn = new Button("Add Node");
-        addBtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                GraphNode node = new GraphNode("TestNode 9");
-                node.addAdjacency(test1);
-                node.addAdjacency(test7);
-                webGraph.addGraphNode(test4);
-                System.out.println("Width: " + webGraph.getPaneWidth() + " Height: " + webGraph.getPaneHeight());
-                System.out.println("Size: " + webGraph.getNumNodes());
-            }
-        });
-        root.getChildren().add(removeBtn);
-        root.getChildren().add(addBtn);
+//        Button removeBtn = new Button("Remove Node");
+//        removeBtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
+//            @Override
+//            public void handle(MouseEvent event) {
+//                webGraph.removeGraphNode(test4);
+//                System.out.println("Width: " + webGraph.getPaneWidth() + " Height: " + webGraph.getPaneHeight());
+//                System.out.println("Size: " + webGraph.getNumNodes());
+//            }
+//        });
+//
+//        Button addBtn = new Button("Add Node");
+//        addBtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
+//            @Override
+//            public void handle(MouseEvent event) {
+//                GraphNode node = new GraphNode("TestNode 9");
+//                node.addAdjacency(test1);
+//                node.addAdjacency(test7);
+//                webGraph.addGraphNode(test4);
+//                System.out.println("Width: " + webGraph.getPaneWidth() + " Height: " + webGraph.getPaneHeight());
+//                System.out.println("Size: " + webGraph.getNumNodes());
+//            }
+//        });
+//        root.getChildren().add(removeBtn);
+//        root.getChildren().add(addBtn);
 
         primaryStage.show();
     }
