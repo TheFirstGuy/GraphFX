@@ -184,24 +184,13 @@ public class GraphNode {
      */
     private void setDragPane(){
 
-//        this.pane.setOnMouseDragged(new javafx.event.EventHandler<MouseEvent>() {
-//            @Override
-//            public void handle(MouseEvent event) {
-//                Pane thisPane = GraphNode.this.pane;
-//                // Calculate coordinates relative to the graph Node.
-//                double deltaX = event.getScreenX() - thisPane.localToScreen(thisPane.getBoundsInLocal()).getMinX();
-//                double deltaY = event.getScreenY() - thisPane.localToScreen(thisPane.getBoundsInLocal()).getMinY();
-//                double newX = thisPane.getLayoutX() + deltaX;
-//                double newY = thisPane.getLayoutY() + deltaY;
-//
-//                GraphNode.this.pane.setLayoutX(newX);
-//                GraphNode.this.pane.setLayoutY(newY);
-//
-//
-//            }
-//        });
 
         this.pane.setOnMouseDragged(event -> {
+            // Check if parent graph allows dragging.
+            if(this.graph != null){
+                this.dragData.valid &= this.graph.isDraggable();
+            }
+
             if(this.dragData.valid){
                 double deltaX = this.dragData.deltaX(event.getScreenX());
                 double deltaY = this.dragData.deltaY(event.getScreenY());
@@ -226,6 +215,7 @@ public class GraphNode {
 
         this.pane.setOnMouseReleased(event -> {
             this.dragData.valid = false;
+
 
         });
 

@@ -133,6 +133,14 @@ public abstract class Graph extends Chart{
 
     public int getNumNodes(){return this.graphNodes.size();}
 
+    public boolean isDraggable(){return this.draggable;}
+
+    public void setDraggable(boolean draggable){this.draggable = draggable;}
+
+    public boolean isPannable(){return this.pannable;}
+
+    public void setPannable(boolean pannable){this.pannable = pannable;}
+
     public double getPaneWidth(){
         return this.graphNodeLayer.getPrefWidth();
     }
@@ -219,7 +227,7 @@ public abstract class Graph extends Chart{
 
         // Handles graph panning
         setOnMouseDragged(event -> {
-            if(this.dragData.valid){
+            if(this.dragData.valid && this.pannable){
                 double deltaX = this.dragData.deltaX(event.getScreenX());
                 double deltaY = this.dragData.deltaY(event.getScreenY());
 
@@ -394,7 +402,6 @@ public abstract class Graph extends Chart{
 
         setPrefWidth(maxX);
         setPrefHeight(maxY);
-
     }
 
     // Protected Fields ================================================================================================
@@ -416,6 +423,10 @@ public abstract class Graph extends Chart{
     protected GraphEdge.PathType pathType = GraphEdge.PathType.STRAIGHT;
 
     protected MouseDragData dragData= new MouseDragData();
+
+    protected  boolean draggable = true;
+
+    protected  boolean pannable = true;
 
     // Inner Classes ===================================================================================================
 

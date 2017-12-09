@@ -61,17 +61,6 @@ public class Main extends Application {
 
         graphPane.getChildren().add(webGraph);
 
-//        test1.getPane().setLayoutX(15);
-//        test1.getPane().setLayoutY(50);
-//
-//        test2.getPane().setLayoutX(75);
-//        test2.getPane().setLayoutY(50);
-//
-//        test3.getPane().setLayoutX(100);
-//        test3.getPane().setLayoutY(100);
-//
-//        test4.getPane().setLayoutX(25);
-//        test4.getPane().setLayoutX(75);
 
         Button removeBtn = new Button("Remove Node");
         removeBtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -99,31 +88,6 @@ public class Main extends Application {
         root.getChildren().add(addBtn);
 
         primaryStage.show();
-//        GraphEdge edge = new GraphEdge(GraphEdge.PathType.CUBIC);
-//        edge.setSourceBindings(test1.getCenterXProperty(), test1.getCenterYProperty());
-//        edge.setDestBindings(test2.getCenterXProperty(), test2.getCenterYProperty());
-//
-//
-//        Pane nodeLayer = new Pane();
-//
-//        root.getChildren().add(edge);
-//        root.getChildren().add(nodeLayer);
-//
-//        nodeLayer.getChildren().add(test1.getPane());
-//        nodeLayer.getChildren().add(test2.getPane());
-//
-//        primaryStage.show();
-//        test1.getPane().setLayoutX(15);
-//        test1.getPane().setLayoutY(50);
-//
-//        test2.getPane().setLayoutX(75);
-//        test2.getPane().setLayoutY(50);
-//
-//        test1.addAdjacency(test2);
-//        test1.addAdjacency(test2);
-
-
-
     }
 
 
