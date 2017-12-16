@@ -385,30 +385,6 @@ public abstract class Graph extends Chart{
         }
     }
 
-    /**
-     * Sets the preferred width and height of the graph based on the coordates of the rightmost node.
-     */
-    protected void autoSizeGraph(){
-        double maxX = Double.MIN_VALUE;
-        double maxY = Double.MIN_VALUE;
-        double layoutX = 0;
-        double layoutY = 0;
-        Iterator<GraphNode> itr = this.graphNodes.iterator();
-        GraphNode currentNode;
-
-        // Find the minimum coordinates
-        while(itr.hasNext()){
-            currentNode = itr.next();
-            layoutX = currentNode.getPane().getLayoutX();
-            layoutY = currentNode.getPane().getLayoutY();
-
-            maxX = (layoutX > maxX) ? layoutX : maxX;
-            maxY = (layoutY > maxY) ? layoutY : maxY;
-        }
-
-        setPrefWidth(maxX);
-        setPrefHeight(maxY);
-    }
 
     // Protected Fields ================================================================================================
 

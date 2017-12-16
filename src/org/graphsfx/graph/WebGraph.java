@@ -46,11 +46,8 @@ public class WebGraph extends Graph {
                 layoutLabel(rootNode);
                 layoutChildren(rootNode);
             }
-
         }
-
         centerGraph();
-        autoSizeGraph();
     }
 
     // Getters & Setters ===============================================================================================

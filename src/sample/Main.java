@@ -7,6 +7,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.graphsfx.graph.WebGraph;
+import org.graphsfx.model.GraphEdge;
 import org.graphsfx.model.GraphNode;
 
 public class Main extends Application {
@@ -28,28 +29,72 @@ public class Main extends Application {
         GraphNode test8 = new GraphNode("TestNode8");
 
 
-        test4.addBidirectionalAdjacency(test1);
-        test4.addBidirectionalAdjacency(test2);
-        test4.addBidirectionalAdjacency(test3);
-        test1.addBidirectionalAdjacency(test4);
-        test2.addBidirectionalAdjacency(test4);
-        test3.addBidirectionalAdjacency(test4);
-        test3.addBidirectionalAdjacency(test5);
-        test5.addBidirectionalAdjacency(test3);
-        test5.addBidirectionalAdjacency(test6);
-        test5.addBidirectionalAdjacency(test7);
-        test5.addBidirectionalAdjacency(test8);
-        test8.addBidirectionalAdjacency(test1);
+//        test4.addBidirectionalAdjacency(test1);
+//        test4.addBidirectionalAdjacency(test2);
+//        test4.addBidirectionalAdjacency(test3);
+//        test1.addBidirectionalAdjacency(test4);
+//        test2.addBidirectionalAdjacency(test4);
+//        test3.addBidirectionalAdjacency(test4);
+//        test3.addBidirectionalAdjacency(test5);
+//        test5.addBidirectionalAdjacency(test3);
+//        test5.addBidirectionalAdjacency(test6);
+//        test5.addBidirectionalAdjacency(test7);
+//        test5.addBidirectionalAdjacency(test8);
+//        test8.addBidirectionalAdjacency(test1);
 
+        graphPane.prefHeightProperty().bind(root.heightProperty());
+        graphPane.prefWidthProperty().bind(root.widthProperty());
         WebGraph webGraph = new WebGraph();
-        graphPane.prefWidthProperty().bind(graphPane.widthProperty());
-        graphPane.prefHeightProperty().bind(graphPane.heightProperty());
+        webGraph.prefWidthProperty().bind(graphPane.widthProperty());
+        webGraph.prefHeightProperty().bind(graphPane.heightProperty());
         graphPane.setPickOnBounds(false);
 
         webGraph.addGraphNode(test4);
 
-        graphPane.getChildren().add(webGraph);
+        //graphPane.getChildren().add(webGraph);
 
+//        GraphNode urs = new GraphNode("Urs Evora");
+//        GraphNode mom = new GraphNode("Sunday Nelson");
+//        GraphNode dad = new GraphNode("Antonio Evora");
+//        GraphNode pete = new GraphNode("Peter Nelson");
+//        GraphNode helen = new GraphNode("Helen Nelson");
+//
+//
+//        urs.addAdjacency(dad);
+//        urs.addAdjacency(mom);
+//        mom.addAdjacency(pete);
+//        mom.addAdjacency(helen);
+//        dad.addAdjacency(test1);
+//        dad.addAdjacency(test2);
+//        dad.addAdjacency(test3);
+//        dad.addAdjacency(test4);
+//        test4.addAdjacency(test5);
+//        pete.addAdjacency(test6);
+//        pete.addAdjacency(test7);
+//        pete.addAdjacency(test8);
+//
+//
+//        TreeGraph treeGraph = new TreeGraph();
+//        treeGraph.prefWidthProperty().bind(graphPane.widthProperty());
+//        treeGraph.prefHeightProperty().bind(graphPane.heightProperty());
+//
+//        treeGraph.addGraphNode(urs);
+//        treeGraph.setRootNode(urs);
+//        graphPane.getChildren().add(treeGraph);
+
+        test1.getPane().setLayoutX(50);
+        test1.getPane().setLayoutY(50);
+        test2.getPane().setLayoutX(100);
+        test2.getPane().setLayoutY(50);
+
+
+        GraphEdge edge = new GraphEdge(GraphEdge.PathType.CUBIC);
+        edge.setSourceBindings(test1.getCenterXProperty(), test1.getCenterYProperty());
+        edge.setDestBindings(test2.getCenterXProperty(), test2.getCenterYProperty());
+
+        graphPane.getChildren().add(edge);
+        graphPane.getChildren().add(test1.getPane());
+        graphPane.getChildren().add(test2.getPane());
 
 //        Button removeBtn = new Button("Remove Node");
 //        removeBtn.setOnMouseClicked(new EventHandler<MouseEvent>() {

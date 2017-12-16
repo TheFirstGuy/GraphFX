@@ -3,8 +3,6 @@ package org.graphsfx.model;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
@@ -132,96 +130,96 @@ public class GraphEdge extends Path{
                 ((LineTo) GraphEdge.this.pathElement).yProperty().bind(this.destY);
                 break;
 
-            case CUBIC:
-
-                // Create bindings for the two pairs of control points
-                CubicCurveTo curveTo = (CubicCurveTo) GraphEdge.this.pathElement;
-                DoubleBinding oneThirdPointX = new DoubleBinding() {
-                    {
-                        super.bind(GraphEdge.this.destX,
-                                GraphEdge.this.destY,
-                                GraphEdge.this.moveTo.xProperty(),
-                                GraphEdge.this.moveTo.yProperty());
-                    }
-                    @Override
-                    protected double computeValue() {
-                        return GraphEdge.calculateThirdPoint(GraphEdge.this.destX.get(),
-                                GraphEdge.this.destY.get(),
-                                GraphEdge.this.moveTo.xProperty().get(),
-                                GraphEdge.this.moveTo.yProperty().get(), false).getX() - 100;
-                    }
-                };
-
-                DoubleBinding oneThirdPointY = new DoubleBinding() {
-                    {
-                        super.bind(GraphEdge.this.destX,
-                                GraphEdge.this.destY,
-                                GraphEdge.this.moveTo.xProperty(),
-                                GraphEdge.this.moveTo.yProperty());
-                    }
-                    @Override
-                    protected double computeValue() {
-                        return GraphEdge.calculateThirdPoint(GraphEdge.this.destX.get(),
-                                GraphEdge.this.destY.get(),
-                                GraphEdge.this.moveTo.xProperty().get(),
-                                GraphEdge.this.moveTo.yProperty().get(), false).getY();
-                    }
-                };
-
-                DoubleBinding twoThirdPointX = new DoubleBinding() {
-                    {
-                        super.bind(GraphEdge.this.destX,
-                                GraphEdge.this.destY,
-                                GraphEdge.this.moveTo.xProperty(),
-                                GraphEdge.this.moveTo.yProperty());
-                    }
-                    @Override
-                    protected double computeValue() {
-                        return GraphEdge.calculateThirdPoint(GraphEdge.this.destX.get(),
-                                GraphEdge.this.destY.get(),
-                                GraphEdge.this.moveTo.xProperty().get(),
-                                GraphEdge.this.moveTo.yProperty().get(), true).getX() * 1.5;
-                    }
-                };
-
-                DoubleBinding twoThirdPointY = new DoubleBinding() {
-                    {
-                        super.bind(GraphEdge.this.destX,
-                                GraphEdge.this.destY,
-                                GraphEdge.this.moveTo.xProperty(),
-                                GraphEdge.this.moveTo.yProperty());
-                    }
-                    @Override
-                    protected double computeValue() {
-                        return GraphEdge.calculateThirdPoint(GraphEdge.this.destX.get(),
-                                GraphEdge.this.destY.get(),
-                                GraphEdge.this.moveTo.xProperty().get(),
-                                GraphEdge.this.moveTo.yProperty().get(), true).getY();
-                    }
-                };
-
-                // Bind control points
-                curveTo.controlX1Property().bind(GraphEdge.this.moveTo.xProperty());
-                curveTo.controlY1Property().bind(GraphEdge.this.moveTo.yProperty());
-                curveTo.controlX2Property().bind(twoThirdPointX);
-                curveTo.controlY2Property().bind(twoThirdPointY);
-                curveTo.xProperty().bind(GraphEdge.this.destX);
-                curveTo.yProperty().bind(GraphEdge.this.destY);
-
-                // Debug statement
-                curveTo.yProperty().addListener(new ChangeListener<Number>() {
-                    @Override
-                    public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                        System.out.println("x: " + curveTo.getX());
-                        System.out.println("y: " + curveTo.getY());
-                        System.out.println("x1: " + curveTo.getControlX1());
-                        System.out.println("y1: " + curveTo.getControlY1());
-                        System.out.println("x2: " + curveTo.getControlX2());
-                        System.out.println("y2: " + curveTo.getControlY2());
-                    }
-                });
-
-                break;
+//            case CUBIC:
+//
+//                // Create bindings for the two pairs of control points
+//                CubicCurveTo curveTo = (CubicCurveTo) GraphEdge.this.pathElement;
+//                DoubleBinding oneThirdPointX = new DoubleBinding() {
+//                    {
+//                        super.bind(GraphEdge.this.destX,
+//                                GraphEdge.this.destY,
+//                                GraphEdge.this.moveTo.xProperty(),
+//                                GraphEdge.this.moveTo.yProperty());
+//                    }
+//                    @Override
+//                    protected double computeValue() {
+//                        return GraphEdge.calculateThirdPoint(GraphEdge.this.destX.get(),
+//                                GraphEdge.this.destY.get(),
+//                                GraphEdge.this.moveTo.xProperty().get(),
+//                                GraphEdge.this.moveTo.yProperty().get(), false).getX() - 100;
+//                    }
+//                };
+//
+//                DoubleBinding oneThirdPointY = new DoubleBinding() {
+//                    {
+//                        super.bind(GraphEdge.this.destX,
+//                                GraphEdge.this.destY,
+//                                GraphEdge.this.moveTo.xProperty(),
+//                                GraphEdge.this.moveTo.yProperty());
+//                    }
+//                    @Override
+//                    protected double computeValue() {
+//                        return GraphEdge.calculateThirdPoint(GraphEdge.this.destX.get(),
+//                                GraphEdge.this.destY.get(),
+//                                GraphEdge.this.moveTo.xProperty().get(),
+//                                GraphEdge.this.moveTo.yProperty().get(), false).getY();
+//                    }
+//                };
+//
+//                DoubleBinding twoThirdPointX = new DoubleBinding() {
+//                    {
+//                        super.bind(GraphEdge.this.destX,
+//                                GraphEdge.this.destY,
+//                                GraphEdge.this.moveTo.xProperty(),
+//                                GraphEdge.this.moveTo.yProperty());
+//                    }
+//                    @Override
+//                    protected double computeValue() {
+//                        return GraphEdge.calculateThirdPoint(GraphEdge.this.destX.get(),
+//                                GraphEdge.this.destY.get(),
+//                                GraphEdge.this.moveTo.xProperty().get(),
+//                                GraphEdge.this.moveTo.yProperty().get(), true).getX() * 1.5;
+//                    }
+//                };
+//
+//                DoubleBinding twoThirdPointY = new DoubleBinding() {
+//                    {
+//                        super.bind(GraphEdge.this.destX,
+//                                GraphEdge.this.destY,
+//                                GraphEdge.this.moveTo.xProperty(),
+//                                GraphEdge.this.moveTo.yProperty());
+//                    }
+//                    @Override
+//                    protected double computeValue() {
+//                        return GraphEdge.calculateThirdPoint(GraphEdge.this.destX.get(),
+//                                GraphEdge.this.destY.get(),
+//                                GraphEdge.this.moveTo.xProperty().get(),
+//                                GraphEdge.this.moveTo.yProperty().get(), true).getY();
+//                    }
+//                };
+//
+//                // Bind control points
+//                curveTo.controlX1Property().bind(GraphEdge.this.moveTo.xProperty());
+//                curveTo.controlY1Property().bind(GraphEdge.this.moveTo.yProperty());
+//                curveTo.controlX2Property().bind(twoThirdPointX);
+//                curveTo.controlY2Property().bind(twoThirdPointY);
+//                curveTo.xProperty().bind(GraphEdge.this.destX);
+//                curveTo.yProperty().bind(GraphEdge.this.destY);
+//
+//                // Debug statement
+//                curveTo.yProperty().addListener(new ChangeListener<Number>() {
+//                    @Override
+//                    public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+//                        System.out.println("x: " + curveTo.getX());
+//                        System.out.println("y: " + curveTo.getY());
+//                        System.out.println("x1: " + curveTo.getControlX1());
+//                        System.out.println("y1: " + curveTo.getControlY1());
+//                        System.out.println("x2: " + curveTo.getControlX2());
+//                        System.out.println("y2: " + curveTo.getControlY2());
+//                    }
+//                });
+//
+//                break;
 
             case QUADRATIC:
 
